@@ -1,0 +1,10 @@
+library(quantmod)
+library(timeSeries)
+library(portfolio)
+library(timeSeries)
+library(zoo)
+
+Sys.setenv(TZ = "UTC")
+currency("USD")
+aapl_stock <- getSymbols("AAPL", from = "2016-01-01", to = "2016-12-31", src = "yahoo", adjust = TRUE, auto.assign = FALSE)
+plot(aapl_stock)
