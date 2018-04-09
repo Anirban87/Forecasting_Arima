@@ -3,6 +3,8 @@ library(shinydashboard)
 skin <- Sys.getenv("DASHBOARD_SKIN")
 skin <- tolower(skin)
 if (skin == "")
+  skin <- "black"
+
 
 sidebar <- dashboardSidebar(
   sidebarSearchForm(label = "Search...", "searchText", "searchButton"),
@@ -20,11 +22,6 @@ sidebar <- dashboardSidebar(
     )
   )
 )
-
-
-
-
-
 
 body <- dashboardBody(
   tabItems(
@@ -120,7 +117,6 @@ body <- dashboardBody(
   )
 )
 
-
 messages <- dropdownMenu(type = "messages",
                          messageItem(
                            from = "Sales Dept",
@@ -140,7 +136,6 @@ messages <- dropdownMenu(type = "messages",
                          )
 )
 
-
 notifications <- dropdownMenu(type = "notifications", badgeStatus = "warning",
                               notificationItem(
                                 text = "5 new users today",
@@ -158,8 +153,6 @@ notifications <- dropdownMenu(type = "notifications", badgeStatus = "warning",
                               )
 )
 
-
-
 tasks <- dropdownMenu(type = "tasks", badgeStatus = "success",
                       taskItem(value = 90, color = "green",
                                "Documentation"
@@ -175,7 +168,6 @@ tasks <- dropdownMenu(type = "tasks", badgeStatus = "success",
                       )
 )
 
-
 header <- dashboardHeader(
   title = "Executive Dashboard",
   messages,
@@ -183,14 +175,12 @@ header <- dashboardHeader(
   tasks
 )
 
-
-
 ui <- dashboardPage(header, sidebar, body, skin = skin)
 
-
-
 server <- function(input, output) {
- set.seed(122)
+  
+  
+  set.seed(122)
   histdata <- rnorm(500)
   
   output$plot1 <- renderPlot({
@@ -224,8 +214,8 @@ server <- function(input, output) {
     print(Stock)
     #getSymbols("AAPL", src = "yahoo",from="2017-07-01")
     # plot(AAPL$AAPL.Close)  
-    Stock_df<-as.data.frame(getSymbols(Symbols = Stock, 
-                                       src = "yahoo", from = "2016-01-01", env = NULL))
+    Stock_df<-as.data.frame(getSymbols(Symbols = Stock, src = "yahoo", from = "2016-01-01", env = NULL))
+                                       
     Stock_df$Open = Stock_df[,1]
     Stock_df$High = Stock_df[,2]
     Stock_df$Low = Stock_df[,3]
@@ -266,7 +256,6 @@ server <- function(input, output) {
     library('forecast')
     library('tseries')
     
-     
     #Stock <- as.character(input$StockCode)
     data <- eventReactive(input$click, {
       (input$StockCode)
@@ -285,20 +274,19 @@ server <- function(input, output) {
     Stock_df$Adj = Stock_df[,6]
     Stock_df <- Stock_df[,c(7,8,9,10,11,12)]
     
-   
     #plot(as.ts(Stock_df$Close))
     
-     
     Stock_df$v7_MA = ma(Stock_df$Close, order=7)
     Stock_df$v30_MA <- ma(Stock_df$Close, order=30)
-     
+    
     #STL
     rental_ma <- ts(na.omit(Stock_df$v7_MA), frequency=30)
     decomp_rental <- stl(rental_ma, s.window="periodic")
     #plot(decomp_rental)
     adj_rental <- seasadj(decomp_rental)
     #plot(adj_rental)
-  
+    
+    
     #arima
     fit <- auto.arima(Stock_df$Close,ic="bic")
     fit.forecast <- forecast.Arima(fit)
@@ -416,7 +404,7 @@ server <- function(input, output) {
     plot(x, y, pch = ".", col = "blue")
   })
   
-output$scatter2 <- renderPlot({
+  output$scatter2 <- renderPlot({
     spread <- as.numeric(input$spread) / 100
     x <- rnorm(1000)
     y <- x + rnorm(1000) * spread
@@ -425,31 +413,5 @@ output$scatter2 <- renderPlot({
   
   
 }
-
-
-
-shinyApp(ui, server)
-
-
-output$scatter1 <- renderPlot({
-  spread <- as.numeric(input$spread) / 100
-  x <- rnorm(1000)
-  y <- x + rnorm(1000) * spread
-  plot(x, y, pch = ".", col = "blue")
-})
-
-
-
-
-output$scatter2 <- renderPlot({
-  spread <- as.numeric(input$spread) / 100
-  x <- rnorm(1000)
-  y <- x + rnorm(1000) * spread
-  plot(x, y, pch = ".", col = "red")
-})
-
-
-
-
 
 shinyApp(ui, server)
